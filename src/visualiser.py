@@ -10,7 +10,7 @@ def main():
     parser.add_argument("input", help="Input file path, any format", type=str)
     parser.add_argument("output", help="Output file path, image file", type=str)
     parser.add_argument("--extract", "-e", default="raw", help="Byte extraction algorithm", type=str)
-    parser.add_argument("--render", "-r", default="bw", help="Image rendering algorithm", type=str)
+    parser.add_argument("--render", "-r", default="grayscale", help="Image rendering algorithm", type=str)
     parser.add_argument("--final", "-f", default="save", help="Save or display the image", type=str)
     args = parser.parse_args()
 
@@ -23,7 +23,7 @@ def main():
 
     # part 2, building the final image
     match args.render:
-        case "bw":
+        case "grayscale":
             image = build_image_bw(file_bytes)
         case _:
             sys.exit("Unknown rendering algorithm")
