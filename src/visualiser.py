@@ -46,6 +46,14 @@ def main():
     match args.render:
         case "grayscale":
             image = build_image_bw(file_bytes)
+        case "rgb":
+            image = build_image_rgb(file_bytes)
+        case "eightbit":
+            image = build_image_p(file_bytes)
+        case "rgba":
+            image = build_image_rgba(file_bytes)
+        case "hsv":
+            image = build_image_hsv(file_bytes)
         case _:
             sys.exit("Unknown render algorithm")
 
@@ -117,8 +125,56 @@ def build_image_bw(bytes):
     for i in range(size):
         for j in range(size):
             if current := next(source, None):
-                pixels[i, j] = current
+                pixels[j, i] = current
     return image
+
+
+def build_image_rgb(bytes):
+    size = math.ceil(len(bytes) / 3)
+    size = math.ceil(math.sqrt(size))
+    image = Image.new("RGB", (size, size), "white")
+    pixels = image.load()
+    source = next_byte(bytes)
+    for i in range(size):
+        for j in range(size):
+            current = (next(source, None), next(source, None), next(source, None))
+            if None not in current:
+                pixels[j, i] = current
+    return image
+
+
+def build_image_p(bytes):
+    image = build_image_rgb(bytes)
+    image = image.quantize(palette=Image.WEB)
+    return image
+
+
+def build_image_rgba(bytes):
+    size = math.ceil(len(bytes) / 4)
+    size = math.ceil(math.sqrt(size))
+    image = Image.new("RGBA", (size, size), "white")
+    pixels = image.load()
+    source = next_byte(bytes)
+    for i in range(size):
+        for j in range(size):
+            current = (next(source, None), next(source, None), next(source, None), next(source, None))
+            if None not in current:
+                pixels[j, i] = current
+    return image
+
+
+def build_image_hsv(bytes):
+    size = math.ceil(len(bytes) / 3)
+    size = math.ceil(math.sqrt(size))
+    image = Image.new("HSV", (size, size), "white")
+    pixels = image.load()
+    source = next_byte(bytes)
+    for i in range(size):
+        for j in range(size):
+            current = (next(source, None), next(source, None), next(source, None))
+            if None not in current:
+                pixels[j, i] = current
+    return image.convert("RGB")
 
 
 def next_byte(bytes):

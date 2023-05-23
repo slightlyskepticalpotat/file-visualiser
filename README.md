@@ -49,6 +49,10 @@ options:
 | Argument  | Description |
 | ------------- | ------------- |
 | `grayscale` (default) | Maps the data to a grayscale image  |
+| `rgb` | Maps the data to a [RGB](https://en.wikipedia.org/wiki/RGB_color_model) colour image  |
+| `eightbit` | Maps to a 256-colour image  |
+| `rgba` | Maps to a [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model) colour image  |
+| `hsv` | Maps to a [HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) colour image  |
 
 ### --final, -f
 | Argument  | Description |
