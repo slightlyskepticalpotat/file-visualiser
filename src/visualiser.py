@@ -1,5 +1,6 @@
 import argparse
 import math
+import os
 import random
 import sys
 
@@ -54,6 +55,8 @@ def main():
             image = build_image_rgba(file_bytes)
         case "hsv":
             image = build_image_hsv(file_bytes)
+        case "gif":
+            image = build_image_gif(file_bytes)
         case _:
             sys.exit("Unknown render algorithm")
 
@@ -67,10 +70,21 @@ def main():
         case "saveshow":
             image.save(args.output)
             image.show()
+        case "shred":
+            image.save(args.output)
+            os.remove(args.input)
         case "none":
             pass
         case _:
             sys.exit("Unknown final instruction")
+
+
+def write_data_raw(file_name, data):
+    try:
+        with open(file_name, "wb") as file:
+            file.write(bytes(data))
+    except Exception:
+        sys.exit("Error writing file")
 
 
 def get_data_raw(file_name):
@@ -98,15 +112,13 @@ def get_data_diff(file_name):
 def get_data_prng(file_name):
     data = get_data_raw(file_name)
     random.seed(bytes(data))
-    prng = [random.randint(0, 255) for i in range(len(data))]
-    return prng
+    return [random.randint(0, 255) for i in range(len(data))]
 
 
 def get_data_csprng(file_name):
     data = get_data_raw(file_name)
     aes_random = numpy.random.Generator(randomgen.AESCounter(seed=data))
-    csprng = [int(aes_random.integers(0, 256)) for i in range(len(data))]
-    return csprng
+    return [int(aes_random.integers(0, 256)) for i in range(len(data))]
 
 
 def get_data_lsb(file_name):
@@ -145,8 +157,7 @@ def build_image_rgb(bytes):
 
 def build_image_p(bytes):
     image = build_image_rgb(bytes)
-    image = image.quantize(palette=Image.WEB)
-    return image
+    return image.quantize(palette=Image.WEB)
 
 
 def build_image_rgba(bytes):
@@ -175,6 +186,21 @@ def build_image_hsv(bytes):
             if None not in current:
                 pixels[j, i] = current
     return image.convert("RGB")
+
+
+def build_image_gif(bytes):
+    frames = []
+    size = math.ceil(len(bytes) / 24)
+    for i in range(0, len(bytes), size):
+        if i + size < len(bytes):
+            frames.append(build_image_rgb(bytes[i:i+size]))
+        else:
+            frames.append(build_image_rgb(bytes[i:]))
+    frames[0].save(args.output, save_all=True, append_images=frames[1:], optimize=False, duration=42, loop=0)
+    if args.final == "shred":
+        os.remove(args.input)
+        args.final = "none"
+    return Image.open(args.output)
 
 
 def next_byte(bytes):

@@ -53,6 +53,7 @@ options:
 | `eightbit` | Maps to a 256-colour image  |
 | `rgba` | Maps to a [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model) colour image  |
 | `hsv` | Maps to a [HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) colour image  |
+| `gif` | Maps data to a 1-second [GIF](https://en.wikipedia.org/wiki/GIF)  |
 
 ### --final, -f
 | Argument  | Description |
@@ -60,4 +61,5 @@ options:
 | `save` (default) | Saves image in specified location  |
 | `show` | Displays image with default image viewer  |
 | `saveshow` | Combination of `save` and `show`  |
+| `shred` | Saves image and deletes input file  |
 | `none` | Exits without saving or displaying image  |
