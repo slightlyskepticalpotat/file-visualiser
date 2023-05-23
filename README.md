@@ -1,5 +1,9 @@
 # file-visualiser
-Visualises any computer file as an image. Applications include forensics, CTF, and art.
+Visualises any computer file as an image. Applications include forensics, CTF, and art. The process is as follows:
+
+1. Extract data from file
+2. Render data to image
+3. Display or save image 
 
 ## Install
 ```bash
@@ -31,17 +35,22 @@ options:
 ```
 
 ## Options
-### --extract
+### --extract, -e
 | Argument  | Description |
 | ------------- | ------------- |
 | `raw` (default) | Takes the raw bytes of the file  |
+| `shuffle` | Shuffles the raw bytes of the file  |
+| `diff` | Takes the difference between bytes  |
+| `prng` | Seeds a [PRNG](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) with the bytes  |
+| `csprng` | Seeds a [CSPRNG](https://en.wikipedia.org/wiki/CSPRNG) with the bytes  |
+| `lsb` | Takes all the least significant bits  |
 
-### --render
+### --render, -r
 | Argument  | Description |
 | ------------- | ------------- |
 | `grayscale` (default) | Maps the data to a grayscale image  |
 
-### --final
+### --final, -f
 | Argument  | Description |
 | ------------- | ------------- |
 | `save` (default) | Saves image in specified location  |

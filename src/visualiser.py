@@ -1,6 +1,10 @@
 import argparse
 import math
+import random
 import sys
+
+import numpy
+import randomgen
 
 from PIL import Image
 
@@ -17,12 +21,23 @@ def main():
                         default="grayscale", help="Image render algorithm")
     parser.add_argument("--final", "-f",
                         default="save", help="Save or display the image")
+    global args
     args = parser.parse_args()
 
     # part 1, getting bytes from image
     match args.extract:
         case "raw":
             file_bytes = get_data_raw(args.input)
+        case "shuffle":
+            file_bytes = get_data_shuffle(args.input)
+        case "diff":
+            file_bytes = get_data_diff(args.input)
+        case "prng":
+            file_bytes = get_data_prng(args.input)
+        case "csprng":
+            file_bytes = get_data_csprng(args.input)
+        case "lsb":
+            file_bytes = get_data_lsb(args.input)
         case _:
             sys.exit("Unknown extraction algorithm")
 
@@ -56,6 +71,42 @@ def get_data_raw(file_name):
             return [int(i) for i in file.read()]
     except Exception:
         sys.exit("Error reading file")
+
+
+def get_data_shuffle(file_name):
+    data = get_data_raw(file_name)
+    random.shuffle(data)
+    return data
+
+
+def get_data_diff(file_name):
+    data = get_data_raw(file_name)
+    diff = []
+    for i in range(len(data) - 1):
+        diff.append((data[i + 1] - data[i]) % 256)
+    return diff
+
+
+def get_data_prng(file_name):
+    data = get_data_raw(file_name)
+    random.seed(bytes(data))
+    prng = [random.randint(0, 255) for i in range(len(data))]
+    return prng
+
+
+def get_data_csprng(file_name):
+    data = get_data_raw(file_name)
+    aes_random = numpy.random.Generator(randomgen.AESCounter(seed=data))
+    csprng = [int(aes_random.integers(0, 256)) for i in range(len(data))]
+    return csprng
+
+
+def get_data_lsb(file_name):
+    data = get_data_raw(file_name)
+    data = [i & 1 for i in data]
+    if args.render == "grayscale":
+        return data
+    return [255 * i for i in data]
 
 
 def build_image_bw(bytes):
