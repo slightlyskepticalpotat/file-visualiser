@@ -14,7 +14,7 @@ python3 visualiser.py --help
 ```py
 usage: visualiser.py [-h] [--extract EXTRACT] [--render RENDER] [--final FINAL] input output
 
-Visualises any file to an image.
+Renders file to image.
 
 positional arguments:
   input                 Input file path, any format
@@ -25,7 +25,7 @@ options:
   --extract EXTRACT, -e EXTRACT
                         Byte extraction algorithm
   --render RENDER, -r RENDER
-                        Image rendering algorithm
+                        Image render algorithm
   --final FINAL, -f FINAL
                         Save or display the image
 ```
@@ -34,14 +34,17 @@ options:
 ### --extract
 | Argument  | Description |
 | ------------- | ------------- |
-| raw (default) | Takes the raw bytes of the file  |
+| `raw` (default) | Takes the raw bytes of the file  |
 
 ### --render
 | Argument  | Description |
 | ------------- | ------------- |
-| grayscale (default) | Maps the data to a grayscale image  |
+| `grayscale` (default) | Maps the data to a grayscale image  |
 
 ### --final
 | Argument  | Description |
 | ------------- | ------------- |
-| save (default) | Saves image in specified location  |
+| `save` (default) | Saves image in specified location  |
+| `show` | Displays image with default image viewer  |
+| `saveshow` | Combination of `save` and `show`  |
+| `none` | Exits without saving or displaying image  |
