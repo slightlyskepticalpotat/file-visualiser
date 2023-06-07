@@ -1,5 +1,5 @@
 # file-visualiser
-Visualises any computer file as an image. Applications include forensics, CTF, and art. The process is as follows:
+Visualises any computer file as an image. Applications include forensics, CTF, and art. Note that in most cases, the image is only intended as an approximation of the input data—the aformentioned data may not always be easily recoverable. The process is as follows:
 
 1. Extract data from file
 2. Render data to image
@@ -10,7 +10,6 @@ Visualises any computer file as an image. Applications include forensics, CTF, a
 git clone https://github.com/slightlyskepticalpotat/file-visualiser.git
 cd file-visualiser
 pip install -r requirements.txt
-cd src
 python3 visualiser.py --help
 ```
 
@@ -39,6 +38,7 @@ options:
 | Argument  | Description |
 | ------------- | ------------- |
 | `raw` (default) | Takes the raw bytes of the file  |
+| `reverse` | Reverses the raw bytes of the file  |
 | `shuffle` | Shuffles the raw bytes of the file  |
 | `diff` | Takes the difference between bytes  |
 | `prng` | Seeds a [PRNG](https://en.wikipedia.org/wiki/Pseudorandom_number_generator) with the bytes  |
@@ -52,6 +52,7 @@ options:
 | `rgb` | Maps the data to a [RGB](https://en.wikipedia.org/wiki/RGB_color_model) colour image  |
 | `eightbit` | Maps to a 256-colour image  |
 | `rgba` | Maps to a [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model) colour image  |
+| `cmyk` | Maps to a [CMYK](https://en.wikipedia.org/wiki/CMYK_color_model) colour image  |
 | `hsv` | Maps to a [HSV](https://en.wikipedia.org/wiki/HSL_and_HSV) colour image  |
 | `gif` | Maps data to a 1-second [GIF](https://en.wikipedia.org/wiki/GIF)  |
 
@@ -62,4 +63,6 @@ options:
 | `show` | Displays image with default image viewer  |
 | `saveshow` | Combination of `save` and `show`  |
 | `shred` | Saves image and deletes input file  |
+| `shredshow` | Saves and shows image, deletes input  |
+| `dump` | Dumps processed bytes as Python list  |
 | `none` | Exits without saving or displaying image  |

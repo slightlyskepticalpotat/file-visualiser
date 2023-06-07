@@ -22,6 +22,8 @@ def main():
                         default="grayscale", help="Image render algorithm")
     parser.add_argument("--final", "-f",
                         default="save", help="Save or display the image")
+    # parser.add_argument("--loop", "-;",
+    #                    default="1", help="Times to loop process image")
     global args
     args = parser.parse_args()
 
@@ -29,6 +31,8 @@ def main():
     match args.extract:
         case "raw":
             file_bytes = get_data_raw(args.input)
+        case "reverse":
+            file_bytes = get_data_reverse(args.input)
         case "shuffle":
             file_bytes = get_data_shuffle(args.input)
         case "diff":
@@ -53,6 +57,8 @@ def main():
             image = build_image_p(file_bytes)
         case "rgba":
             image = build_image_rgba(file_bytes)
+        case "cmyk":
+            image = build_image_cmyk(file_bytes)
         case "hsv":
             image = build_image_hsv(file_bytes)
         case "gif":
@@ -73,6 +79,12 @@ def main():
         case "shred":
             image.save(args.output)
             os.remove(args.input)
+        case "shredshow":
+            image.save(args.output)
+            image.show()
+            os.remove(args.input)
+        case "dump":
+            print(file_bytes)
         case "none":
             pass
         case _:
@@ -93,6 +105,11 @@ def get_data_raw(file_name):
             return [int(i) for i in file.read()]
     except Exception:
         sys.exit("Error reading file")
+
+
+def get_data_reverse(file_name):
+    data = get_data_raw(file_name)
+    return data[::-1]
 
 
 def get_data_shuffle(file_name):
@@ -149,8 +166,8 @@ def build_image_rgb(bytes):
     source = next_byte(bytes)
     for i in range(size):
         for j in range(size):
-            current = (next(source, None), next(source, None), next(source, None))
-            if None not in current:
+            current = (next(source, -1), next(source, -1), next(source, -1))
+            if -1 not in current:
                 pixels[j, i] = current
     return image
 
@@ -168,10 +185,26 @@ def build_image_rgba(bytes):
     source = next_byte(bytes)
     for i in range(size):
         for j in range(size):
-            current = (next(source, None), next(source, None), next(source, None), next(source, None))
-            if None not in current:
+            current = (next(source, -1), next(source, -1), next(source, -1),
+                       next(source, -1))
+            if -1 not in current:
                 pixels[j, i] = current
     return image
+
+
+def build_image_cmyk(bytes):
+    size = math.ceil(len(bytes) / 4)
+    size = math.ceil(math.sqrt(size))
+    image = Image.new("CMYK", (size, size), "white")
+    pixels = image.load()
+    source = next_byte(bytes)
+    for i in range(size):
+        for j in range(size):
+            current = (next(source, -1), next(source, -1), next(source, -1),
+                       next(source, -1))
+            if -1 not in current:
+                pixels[j, i] = current
+    return image.convert("RGB")
 
 
 def build_image_hsv(bytes):
@@ -182,8 +215,8 @@ def build_image_hsv(bytes):
     source = next_byte(bytes)
     for i in range(size):
         for j in range(size):
-            current = (next(source, None), next(source, None), next(source, None))
-            if None not in current:
+            current = (next(source, -1), next(source, -1), next(source, -1))
+            if -1 not in current:
                 pixels[j, i] = current
     return image.convert("RGB")
 
@@ -193,11 +226,14 @@ def build_image_gif(bytes):
     size = math.ceil(len(bytes) / 24)
     for i in range(0, len(bytes), size):
         if i + size < len(bytes):
-            frames.append(build_image_rgb(bytes[i:i+size]))
+            frames.append(build_image_p(bytes[i:i+size]))
         else:
-            frames.append(build_image_rgb(bytes[i:]))
-    frames[0].save(args.output, save_all=True, append_images=frames[1:], optimize=False, duration=42, loop=0)
-    if args.final == "shred":
+            frames.append(build_image_p(bytes[i:]))
+    frames[0].save(args.output, save_all=True, append_images=frames[1:],
+                   duration=42, loop=0)
+    if args.final in ["save", "show", "saveshow"]:
+        args.final = "none"
+    elif args.final in ["shred", "shredshow"]:
         os.remove(args.input)
         args.final = "none"
     return Image.open(args.output)
